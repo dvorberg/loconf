@@ -1,0 +1,87 @@
+# Concept-file for the loconf language.
+
+# Comments
+# - A hash symbol will mark a comment to the end of line. Any whitespace
+#   on the line before it, the symbol itself and any characters to the end of
+#   line will be removed prior to processing.
+# - C-style inline comments /* … */ will be removed prior to processing. They
+#   may span several lines and must not be nested. 
+
+# Number literals may be in any one of these formats:
+# - decimal ([0-9]+)
+# - hexadecimal 0x([0-9a-fA-F]+)
+# - octal 0o([0-7+])
+# - binary 0b([01]+)
+# - The keyword “NULL” which indicates ”no change”. 
+
+# Number expressions are enclosed in parentheses and come in two flavors: 
+# - sum (a + b + c + …) in which a,b,c,… are powers of two. “(2+4+32)” 
+#   evaluates to 38 decimal and activates bits 1, 2, and 5.
+# - bit shift operator (a << b << c << …) in which a,b,c,… are bit numbers.
+#   (1 << 2 << 5) is equivalent to the above and evaluaes to 38 decimal
+#   activating bits 1, 2, and 5.
+
+# Identifyer definitions start with the “name” keyword followed by the
+# number and the identifyer to be used. Identifyers may be used in place
+# of any number. Identifyer regex is [^\d\W]\w* meaning it must start with any 
+# letter (unicode characters included) that may be followed by any number
+# (including zero) of letters or digits. This is equivalent to what one is
+# used to in most programming languages. Identifyers are case sensitive.
+# The following names are reseved:
+# - The keywords “name” and “include”.
+# - Indicator for CVs not set: NULL. 
+name 1 address
+name 2 start_voltage
+name 3 accTime
+name 4 decTime
+name 5 Vmax
+name 6 Vmin
+name 7 software_version
+name 8 manufacturer_id
+
+name 255 full
+name 128 half
+name   0 none
+
+# Identifyers may not be re-assigned. 
+
+# The “no change” indicator is a regular number literal and may be assinged
+# to identifyers.
+name NULL None
+name NULL NaN
+
+# You may assign an identifyer to another. 
+name None null 
+
+# Include another .lconf file. 
+# include "dcc_names.loconf" 
+
+# These you may not want to assign anything to anyway. Setting the loco
+# address may requre special provisions. 
+address := NULL
+
+# The decoders I know will reset to factory default on assignment to
+# CV 8.
+software_version := NULL
+manufacturer_id := NULL
+
+# The main part of the file are assignments using the walrus operator
+# “:=”. Left hand operand is the CV number (in any number format or as
+# identifyer), right hand operator is the same. 
+start_voltage := 20
+accTime := 5
+decTime := 3
+Vmax := half
+Vmin := 5
+
+# CV 29 NMRA configuration
+#Bit 0 Value  1 0 = standard driving direction 1 = reverse driving direction
+#Bit 1 Value  2 0 = 14 speed steps             1 = 28/128 speed steps
+#Bit 2 Value  4 0 = only digital operation     1 = digital + analog operation
+#Bit 3 Value  8 0 = RailCom generally off      1 = RailCom enabled
+#Bit 4 Value 16 0 = internal driving courve    1 = programm. drive courve
+#Bit 5 Value 32 0 = short loco address (CV 1)  1 = long loco address (CV 17/18)
+29 := [ 2, # digital + analog operation 
+        3  # RailCom enabled
+      ]
+

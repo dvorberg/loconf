@@ -1,0 +1,32 @@
+# To be used by include_demo.loconf.
+
+name 1 address
+name 2 start_voltage
+name 3 accTime
+name 4 decTime
+name 5 Vmax
+name 6 Vmin
+name 7 software_version
+name 8 manufacturer_id
+
+name 255 full
+name 128 half
+name   0 none
+
+# Identifyers may not be re-assigned. 
+
+# The “no change” indicator is a regular number literal and may be assinged
+# to identifyers.
+name NULL None
+name NULL NaN
+
+# You may assign an identifyer to another. 
+name None null 
+
+address := NULL
+
+# The decoders I know will reset to factory default on assignment to
+# CV 8.
+software_version := NULL
+manufacturer_id := NULL
+

@@ -1,0 +1,6 @@
+virtualenv
+.virtualenc.nosync.noindex
+*.pyc
+*~
+site-packages
+virtualenv
