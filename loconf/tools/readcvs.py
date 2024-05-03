@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
-import argparse, pathlib, re
+import sys, argparse, pathlib, re, datetime
 from loconf import config, debug
+
+from loconf.language.parser import Parser
 
 cv_re = re.compile(r"(\d+)-(\d+)|(\d+)")
 def main():
@@ -19,6 +21,13 @@ def main():
                         help="To make sure you are changing the correct "
                         "locomotives’s CVs, provide the cab number of the "
                         "loco on the programming track here.")
+    parser.add_argument("-o", "--outfile", type=argparse.FileType('w'),
+                        default=sys.stdout, help="Output file. "
+                        "Defaults to stdout.")
+    parser.add_argument("-n", "--names-file", type=argparse.FileType('r'),
+                        default=None, help="Read variable name definitions "
+                        "from this file. These names will be used as left "
+                        "hand operands as in “name” := “value”.")
     parser.add_argument("ranges", nargs="+",
                         help= "CV numbers may be single numbers, separated by "
                         "comma or space or ranges as in start-stop.")
@@ -50,6 +59,22 @@ def main():
                 for cv in find_cvs(s):
                     yield cv
 
+    now = datetime.datetime.now()
+    print(f"CVs read from address {args.cab} on {now.ctime()}",
+          file=args.outfile)
+    print(file=args.outfile)
+
+    if args.names_file is None:
+        names = {}
+    else:
+        parser = Parser()
+        parser.parse(args.names_file)
+        names = dict( [(value, name,)
+                       for (name, value) in parser.variables.items()] )
+
+        print(f'include "{args.names_file.name}"', file=args.outfile)
+        print("", file=args.outfile)
+
     cvs = sorted(list(set(ranges())))
 
     station = config.station
@@ -63,9 +88,17 @@ def main():
         debug("verified!", color="green")
 
     for cv in cvs:
-        debug("Reading CV", cv)
+        debug("Reading CV", cv, end=" ")
         value = station.readcv(cv)
-        print(cv, ":=", value)
+
+        if cv in names:
+            left_hand = names[cv]
+        else:
+            left_hand = cv
+
+        debug(left_hand, ":=", value, color="grey")
+
+        print(left_hand, ":=", value, file=args.outfile)
 
 if __name__ == "__main__":
     main()
