@@ -75,6 +75,7 @@ class Setting:
 class Parser(object):
     def __init__(self, include_paths=[]):
         self.include_paths = include_paths
+        self.variables = {}
 
     def parse(self, infile):
         include_paths = copy.copy(self.include_paths)
@@ -84,7 +85,6 @@ class Parser(object):
         if filepath is not None:
             include_paths.insert(0, pathlib.Path(filepath).absolute().parent)
 
-        variables = {}
         cvs = {} # Maps number:int to Setting
 
         infilepaths = set()
@@ -135,11 +135,11 @@ class Parser(object):
                     return token.value
                 case "identifyer":
                     identifyer = token.value
-                    if identifyer not in variables:
+                    if identifyer not in self.variables:
                         raise ParseError(f"Unknown identifyer: “{identifyer}”.",
                                          token.get_location())
                     else:
-                        return variables[identifyer]
+                        return self.variables[identifyer]
                 case "open_paren":
                     return parse_sum()
                 case "open_bracket":
@@ -192,11 +192,11 @@ class Parser(object):
                     number = expect_number()
                     identifyer = expect("identifyer").value
 
-                    if identifyer in variables:
+                    if identifyer in self.variables:
                         raise ParseError(
                             f"Identifyer already defined: {identifyer}")
                     else:
-                        variables[identifyer] = number
+                        self.variables[identifyer] = number
 
                 case "include_keyword":
                     path = pathlib.Path(expect("string_literal").value)
