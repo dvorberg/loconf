@@ -1,0 +1,17 @@
+# Concept-file for the loconf language.
+# See standalone_demo.loconf for more info.
+
+# Include another .lconf file. 
+include "standard_defs.loconf" 
+
+# These you may not want to assign anything to anyway. Setting the loco
+# address may requre special provisions. 
+# The main part of the file are assignments using the walrus operator
+# “:=”. Left hand operand is the CV number (in any number format or as
+# identifyer), right hand operator is the same. 
+start_voltage := 20
+accTime := 5
+decTime := 3
+Vmax := half
+Vmin := 5
+
