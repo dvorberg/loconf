@@ -1,0 +1,120 @@
+# Include another .lconf file. 
+include "standard_defs.loconf" 
+
+name 7 decoder_reset
+# basic settings (CV 1,11-13,17-19,29-119)
+# programming lock (CV 15/16)
+# light outputs (CV50-59)
+# function outputs (CV 1x0-1x4)
+# engine functions (CV2-6,9,10,54-25,60-66) servo functions (CV 1x5-1x9)
+
+name 9 engine_frequency
+# 0 = 16 kHz
+# 1 = 2 kHz
+# 2 = 250 Hz
+# 3 = 60 Hz
+# 4 = 100 kHz
+#
+# Don’t set this. Broke my decoder.
+
+name 11 analog_timeout
+name 13 analog_functions
+# Function outputs in analog mode (on if value is set)
+# Add the values to the desired function!
+# A1 = 1, A2 = 2, A3 = 4, A4 = 8, A5 = 16, A6 = 32
+
+name 15 prog_lock_key
+name 16 prog_lock_lock
+
+name 19 consist_address
+# Loco address for multi traction +128 = invers direction.
+
+name 20 spinning_wheels_effect
+# 0–30 Larger number, more wheelspin effects.
+
+name 26 noise_filter
+# 0–5 If higher value, more noise filter.
+
+name 27 stop_configuration
+name 28 railcom_configuration
+name 29 nmra_configuration
+
+# Front light
+name 50 lf_command
+name 51 lf_dimming
+name 52 lf_condition
+name 53 lf_special
+name 54 lf_time
+
+# Back light
+name 55 lb_command
+name 56 lb_dimming
+name 57 lb_condition
+name 58 lb_special
+name 59 lb_time
+
+name 120 A_command
+name 121 A_dimming
+name 122 A_condition
+name 123 A_special
+name 124 A_time
+name 125 A_servo_speed
+name 126 A_servo_right_stop
+name 127 A_servo_left_stop   
+name 128 A_servo_invers      # 0 oder 1
+name 129 A_servo_stop_at_end # 0 oder 1
+
+name 130 B_command
+name 131 B_dimming
+name 132 B_condition
+name 133 B_special
+name 134 B_time
+name 135 B_servo_speed
+name 136 B_servo_right_stop
+name 137 B_servo_left_stop   
+name 138 B_servo_invers      # 0 oder 1
+name 139 B_servo_stop_at_end # 0 oder 1
+
+name 140 C_command
+name 141 C_dimming
+name 142 C_condition
+name 143 C_special
+name 144 C_time
+name 145 C_servo_speed
+name 146 C_servo_right_stop
+name 147 C_servo_left_stop   
+name 148 C_servo_invers      # 0 oder 1
+name 149 C_servo_stop_at_end # 0 oder 1
+
+name 150 D_command
+name 151 D_dimming
+name 152 D_condition
+name 153 D_special
+name 154 D_time
+name 155 D_servo_speed
+name 156 D_servo_right_stop
+name 157 D_servo_left_stop   
+name 158 D_servo_invers      # 0 oder 1
+name 159 D_servo_stop_at_end # 0 oder 1
+
+name 160 E_command
+name 161 E_dimming
+name 162 E_condition
+name 163 E_special
+name 164 E_time
+name 165 E_servo_speed
+name 166 E_servo_right_stop
+name 167 E_servo_left_stop   
+name 168 E_servo_invers      # 0 oder 1
+name 169 E_servo_stop_at_end # 0 oder 1
+
+name 170 F_command
+name 171 F_dimming
+name 172 F_condition
+name 173 F_special
+name 174 F_time
+name 175 F_servo_speed
+name 176 F_servo_right_stop
+name 177 F_servo_left_stop   
+name 178 F_servo_invers      # 0 oder 1
+name 179 F_servo_stop_at_end # 0 oder 1
