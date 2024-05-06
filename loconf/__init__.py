@@ -104,5 +104,8 @@ def _debug(doit:bool, *args, color="black", **kw):
 def debug(*args, color="grey", **kw):
     _debug(config.debug, *args, color=color, **kw)
 
+def sqldebug(*args, color="cyan", **kw):
+    _debug(config.sqldebug, *args, color=color, **kw)
+
 def comdebug(*args, color="light_grey", **kw):
     _debug(config.comdebug, *args, color=color, **kw)
