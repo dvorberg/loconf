@@ -231,6 +231,10 @@ class Parser(object):
 
         return dict([(cv, setting.value) for cv, setting in cvs.items()])
 
+def parse_file(fp):
+    parser = Parser()
+    return parser.parse(fp)
+
 if __name__ == "__main__":
     import pathlib, argparse
 
@@ -238,7 +242,5 @@ if __name__ == "__main__":
     ap.add_argument("infilepath", type=pathlib.Path)
     args = ap.parse_args()
 
-    parser = Parser()
-    cvs = parser.parse(args.infilepath.open())
-
+    cvs = parse_file(ap.infilepath.open())
     ic(cvs)
