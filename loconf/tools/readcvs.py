@@ -7,11 +7,12 @@ Read CVs from the locomotive currently on the programming track.
 import sys, argparse, pathlib, re, datetime
 
 from loconf import config, debug
+from loconf.station import StationException
 
 from . import common_args
 from .utils import read_names_file
 
-cv_re = re.compile(r"(\d+)-(\d+)|(\d+)")
+cv_re = re.compile(r"(\d+)[-–](\d+)|(\d+)")
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
 
@@ -92,11 +93,13 @@ def main():
             debug(left_hand, ":=", value, color="grey")
 
             print(left_hand, ":=", value, file=args.outfile)
+
+            to_be_stored[cv] = value
     except StationException:
         raise
     finally:
         # Store the read cvs in the database.
-        config.database.store(cab, to_be_stored, args.revision_comment)
+        config.database.store(args.cab, to_be_stored, args.revision_comment)
 
 
 if __name__ == "__main__":
