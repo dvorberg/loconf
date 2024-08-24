@@ -154,5 +154,5 @@ class PostgresDatabase(Database):
         cursor.execute("SELECT id, address, comment, ctime "
                        "  FROM revision"
                        " WHERE address = %s"
-                       " ORDER BY id DESC", ( cab, ))
+                       " ORDER BY id ASC", ( cab, ))
         return [ Revision(*tpl) for tpl in cursor.fetchall() ]
