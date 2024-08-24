@@ -1,0 +1,83 @@
+# A database revision test.
+
+include "lok_commander_2a_variables.loconf"
+
+Vmax := 129
+Vmin := 63
+
+lf_command := 0
+lf_dimming := 228
+lf_condition := 1
+lf_special := 0
+lf_time := 10
+lb_command := 0
+lb_dimming := 228
+lb_condition := 2
+lb_special := 0
+lb_time := 10
+
+A_command := 1
+A_dimming := 100
+A_condition := 2
+A_special := 0
+A_time := 5
+A_servo_speed := 1
+A_servo_right_stop := 200
+A_servo_left_stop := 20
+A_servo_invers := 1
+A_servo_stop_at_end := 1
+
+B_command := 1
+B_dimming := 100
+B_condition := 1
+B_special := 0
+B_time := 5
+B_servo_speed := 1
+B_servo_right_stop := 200
+B_servo_left_stop := 20
+B_servo_invers := 1
+B_servo_stop_at_end := 1
+
+C_command := 3
+C_dimming := 100
+C_condition := 0
+C_special := 5
+C_time := 30
+C_servo_speed := 1
+C_servo_right_stop := 200
+C_servo_left_stop := 20
+C_servo_invers := 1
+C_servo_stop_at_end := 1
+
+D_command := 7
+D_dimming := 100
+D_condition := 0
+D_special := 5
+D_time := 30
+D_servo_speed := 1
+D_servo_right_stop := 200
+D_servo_left_stop := 20
+D_servo_invers := 1
+D_servo_stop_at_end := 1
+
+E_command := 5
+E_dimming := 100
+E_condition := 0
+E_special := 0
+E_time := 5
+E_servo_speed := 1
+E_servo_right_stop := 200
+E_servo_left_stop := 20
+E_servo_invers := 1
+E_servo_stop_at_end := 1
+
+F_command := 6
+F_dimming := 100
+F_condition := 0
+F_special := 20
+F_time := 5
+F_servo_speed := 1
+F_servo_right_stop := 200
+F_servo_left_stop := 20
+F_servo_invers := 1
+F_servo_stop_at_end := 1

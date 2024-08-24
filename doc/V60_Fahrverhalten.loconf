@@ -1,0 +1,54 @@
+# CVs read from address 5 on Mon Aug 12 18:12:03 2024
+
+include "lok_commander_2a_variables.loconf"
+
+start_voltage := 10
+accTime := 2
+decTime := 2
+Vmax := 128
+Vmin := 64
+analog_timeout := 50
+spinning_wheels_effect := 0
+
+# Kupplungswalzer deaktivieren
+24 := 64
+
+
+noise_filter := 2
+railcom_configuration := 0
+nmra_configuration := 2
+
+# CV 49 mXion Konfiguration
+# 0 ->   1 Digitale Lastregelung 
+# 1 ->   2 Analoge Lastregelung 
+# 2 ->   4 SUSI
+# 3 ->   8 Märklin Zug Bus 
+# 4 ->  16 Motorbremse 
+# 5 ->  32 Lightausgänge normale / invers
+# 6 ->  64 Normales Mapping / Schweizer-Mapping (SM)
+# 7 -> 128 Digitalrichtung beibehalten
+49 := 0
+
+# Lastregelung: Nachregelung
+60 := 2
+
+# Lastregelung: Verzögerung
+61 := 2
+
+# Lastregelung: Begrenzung
+62 := 37
+
+# Wartezeit bei Richtungswechsel
+99 := 1
+
+# Rangiergang (Anhang 1) 
+100 := 2
+
+# Schaltbare Verzögerungszeiten (Anhang 1) 
+101 := 4
+
+# Anhang 1 – Schaltbefehlszuordnung
+# Wert Verwendung
+# 0–68 0 = Schalten per Lichttaste 1 – 68 = Schalten per F-Taste
+#  +64 dauerhaft ausgeschaltet
+# +128 dauerhaft angeschaltet
