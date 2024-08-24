@@ -90,16 +90,20 @@ class ReadCV(Response):
     """
     <P cv>: Request value of “CV”.
     """
-    regex = re.compile(r"<v (?P<cv>\d+) (?P<value>\d+)>")
+    regex = re.compile(r"<v (?P<cv>\d+) (?P<value>-?\d+)>")
     cv: int
     value: int
 
+class WriteCV(Response):
+    regex = re.compile(r"<r (?P<cv>\d+) (?P<value>-?\d+)>")
+    cv: int
+    value: int
 
 class ReadAddress(Response):
     """
     <R>: Request the address of the engine on the programming track.
     """
-    regex = re.compile(r"<r (?P<address>\d+)>")
+    regex = re.compile(r"<r (?P<address>-?\d+)>")
     address: int
 
 class ReadCVplus(Response):
@@ -111,7 +115,7 @@ class ReadCVplus(Response):
                        r"(?P<callbacknum>\d+)\|"
                        r"(?P<callbacksub>\d+)\|"
                        r"(?P<cv>\d+) "
-                       r"(?P<value>\d+)>")
+                       r"(?P<value>-?\d+)>")
     cv: int
     value: int
     callbacknum: int
