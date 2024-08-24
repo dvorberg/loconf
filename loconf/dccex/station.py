@@ -1,12 +1,8 @@
 import io, serial, time, types
 
 from .. import debug, comdebug
-from ..station import Station
+from ..station import Station, StationException
 from . import responses
-
-class StationException(Exception):
-    def __init__(self, command=None):
-        self.command = command
 
 class StationError(StationException):
     """
@@ -16,6 +12,11 @@ class StationError(StationException):
 class StationTimeout(StationException):
     """
     Waiting for a response line from the station has timed out.
+    """
+
+class ReadFailed(StationException):
+    """
+    Failed to read a value from the decoder.
     """
 
 class DCCEX_Station(Station):
@@ -100,6 +101,8 @@ class DCCEX_Station(Station):
         integer or None on error.
         """
         response = self.communicate("<R>", responses.ReadAddress)
+        if response.address == -1:
+            raise ReadFailed("Failed to read cab address from decoder.")
         return response.address
 
 
@@ -109,4 +112,14 @@ class DCCEX_Station(Station):
         currently on the programming track.
         """
         response = self.communicate("<R %i>" % cv, responses.ReadCV)
+        if response.value == -1:
+            raise ReadFailed("Failed to read CV #%i value from decoder." % cv)
         return response.value
+
+    def writecv(self, cv:int, value:int) -> responses.Response:
+        response = self.communicate("<W %i %i>" % ( cv, value, ),
+                                    responses.WriteCV)
+        if response.value == -1:
+            raise ReadFailed("Failed to write CV #%i value %i to decoder." % (
+                cv, value,))
+        return response
