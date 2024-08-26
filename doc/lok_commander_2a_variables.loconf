@@ -39,6 +39,17 @@ name 27 stop_configuration
 name 28 railcom_configuration
 name 29 nmra_configuration
 
+# CV 49 mXion Konfiguration
+# 0 ->   1 Digitale Lastregelung 
+# 1 ->   2 Analoge Lastregelung 
+# 2 ->   4 SUSI on/off
+# 3 ->   8 Märklin Train Bus on/off
+# 4 ->  16 locking brake on/off
+# 5 ->  32 light outputs normal=0/inverse=1
+# 6 ->  64 normal mapping=0/Swiss mapping=1
+# 7 -> 128 digital -> analog normal=0 / digital direction holding=1
+name 49 mxion_configuration
+
 # Front light
 name 50 lf_command
 name 51 lf_dimming
