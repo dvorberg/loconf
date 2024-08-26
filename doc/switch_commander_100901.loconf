@@ -1,0 +1,209 @@
+# Include another .lconf file. 
+include "standard_defs.loconf" 
+
+name 7 decoder_reset
+# 11 basic settings (CV 1,11-13,17-19,29-119)
+# 16 programming lock (CV 15/16)
+# 22 light outputs (CV50-59)
+# 33 function outputs (CV 1x0-1x4)
+# 44 engine functions (CV2-6,9,10,54-25,60-66)
+# 66 servo functions (CV 1x5-1x9)
+
+name 11 analog_timeout
+name 13 analog_functions
+# add the values to the desired function!
+# A1 = 1, A2 = 2, A3 = 4, A4 = 8,
+# A5 = 16, A6 = 32, A7 = 64, A8 = 128
+
+name 15 prog_lock_key
+name 16 prog_lock_lock
+
+name 26 noise_filter
+# 0–5 If higher value, more noise filter.
+
+name 28 railcom_configuration
+name 29 nmra_configuration
+
+# CV 49 mXion Konfiguration
+# 2 ->   4 SUSI on/off
+# 3 ->   8 Märklin Train Bus on/off
+# 4 ->  16 locking brake on/off
+# 5 ->  32 light outputs normal=0/inverse=1
+# 6 ->  64 normal mapping=0/Swiss mapping=1
+# 7 -> 128 digital -> analog normal=0 / digital direction holding=1
+name 49 mxion_configuration
+
+name 98 random_generator
+name 99 wait_time_direction_change
+
+# command: 0 = Light key, 1–63 F-keys
+# dimming: 0–100 -> “%”  (1 % is around 0,2 V) + 128 -> fade in/out
+# condition: See attachment 3, names defined below.
+# special: See attachment 4, names defined below. 
+# time: The meaning of the time value depends on the special, see attachment 3.
+
+# A1
+name 120 A_command
+name 121 A_dimming   
+name 122 A_condition
+name 123 A_special
+name 124 A_time
+
+name 120 A1_command
+name 121 A1_dimming
+name 122 A1_condition
+name 123 A1_special
+name 124 A1_time
+
+
+# A2
+name 125 B_command
+name 126 B_dimming
+name 127 B_condition
+name 128 B_special
+name 129 B_time
+
+name 125 A2_command
+name 126 A2_dimming
+name 127 A2_condition
+name 128 A2_special
+name 129 A2_time
+
+
+# A3
+name 130 C_command
+name 131 C_dimming
+name 132 C_condition
+name 133 C_special
+name 134 C_time
+
+name 130 A3_command
+name 131 A3_dimming
+name 132 A3_condition
+name 133 A3_special
+name 134 A3_time
+
+
+# A4
+name 135 D_command
+name 136 D_dimming
+name 137 D_condition
+name 138 D_special
+name 139 D_time
+
+name 135 A4_command
+name 136 A4_dimming
+name 137 A4_condition
+name 138 A4_special
+name 139 A4_time
+
+# A5
+name 140 E_command
+name 141 E_dimming
+name 142 E_condition
+name 143 E_special
+name 144 E_time
+
+name 140 A5_command
+name 141 A5_dimming
+name 142 A5_condition
+name 143 A5_special
+name 144 A5_time
+
+# A6
+name 145 F_command
+name 146 F_dimming
+name 147 F_condition
+name 148 F_special
+name 149 F_time
+
+name 145 A6_command
+name 146 A6_dimming
+name 147 A6_condition
+name 148 A6_special
+name 149 A6_time
+
+
+# A7
+name 150 G_command
+name 151 G_dimming
+name 152 G_condition
+name 153 G_special
+name 154 G_time
+
+name 150 A7_command
+name 151 A7_dimming
+name 152 A7_condition
+name 153 A7_special
+name 154 A7_time
+
+
+# A8
+name 155 H_command
+name 156 H_dimming
+name 157 H_condition
+name 158 H_special
+name 159 H_time
+
+name 155 A8_command
+name 156 A8_dimming
+name 157 A8_condition
+name 158 A8_special
+name 159 A8_time
+
+
+# A9
+name 160 I_command
+name 161 I_dimming
+name 162 I_condition
+name 163 I_special
+name 164 I_time
+
+name 160 A9_command
+name 161 A9_dimming
+name 162 A9_condition
+name 163 A9_special
+name 164 A9_time
+
+## ATTACHMENTS
+
+# Attachment 3: Conditions
+name 0 permanent #  (normal function)
+name 1 forward_only
+name 2 backward_only
+name 3 standing_only
+name 4 standing_forward_only
+name 5 standing_backward_only
+name 6 driving_only
+name 7 driving_forward_only
+name 8 driving_backward_only
+
+# Attachment 4: Special Functions
+name 0 normal_output         # no special function (normal output)
+name 1 flash_symetric        # time base (0,1s / value)
+name 2 flash_asymetric_short # ON (1:4) time base (0,1s / Value) is for the
+name 3 flash_asymetric_long  #  ON (4:1) long value
+name 4 photographer_flash    # time base (0,25s / value)
+name 5 monoflop              # (automatic switch off) time base (0,1s / value)
+name 6 delayed               # time base (0,1s / value)
+name 7 firebox
+name 8 tv #  flickering
+name 9 petroleum  # flickering
+name 10 flourescent_tube
+name 11 defective_flourescent_tube
+name 12 alternating_flash # to paired output in combination with second output  (e.g. A1 & A2, A3 & A4)
+name 13 us_strobelight
+name 14 us_double_strobelight
+name 15 us_marslight         # time base (0,1s / value)
+name 16 us_ditch_light       # in combination with second output (e.g. A1 & A2, A3 & A4), 1st output normal light, 2nd ditch light function
+name 17 sodium_lamp
+name 18 welding              # light use with blue led
+name 20 buffer_control       # “BC”
+name 21 clock_simulation     # if CV115 = 1
+name 22 pulsed_smoke_steam   # control for steam engine only for fan, heating at a separate output (whatever which)
+name 23 pulsed_smoke_diesel  # engine only for fan, heating at a separate output (whatever which)
+name 24 Kupplungswalzer
+
+# +32 Switch delayed off delay time is special funct time
+# +64 Far away light adding Far away light over CV 97
+# +128 invers add value to function
