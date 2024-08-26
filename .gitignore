@@ -1,5 +1,7 @@
 virtualenv
 .virtualenc.nosync.noindex
+.virtualenc.noindex.nosync
+.virtualenv.nosync.noindex
 *.pyc
 *~
 site-packages
