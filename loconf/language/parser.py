@@ -203,13 +203,16 @@ class Parser(object):
 
                     if path.is_absolute():
                         inpath = path
-                    else:
-                        # Try to find the file to be included along the
-                        # input path.
-                        for ip in include_paths:
-                            inpath = pathlib.Path(ip, path)
-                            if inpath.exists:
-                                break
+                    else: # Check for path relative to the current input file.
+                        location = token.get_location()
+                        inpath = pathlib.Path(location.filepath.parent, path)
+                        if not inpath.exists():
+                            # Try to find the file to be included along the
+                            # input path.
+                            for ip in include_paths:
+                                inpath = pathlib.Path(ip, path)
+                                if inpath.exists:
+                                    break
 
                     tokens = itertools.chain(tokens_from(inpath.open()), tokens)
 
