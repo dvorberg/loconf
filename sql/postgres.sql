@@ -2,10 +2,11 @@ BEGIN;
 
 CREATE TABLE roster
 (
-   identifyer TEXT NOT NULL,
    -- Identifyer for this entry (on the cmd line)   
-   name TEXT NOT NULL DEFAULT '',
+   identifyer TEXT NOT NULL UNIQUE,
+   
    -- Name for this vehicle for pretty printing
+   name TEXT NOT NULL DEFAULT '',
    
    address INTEGER, -- Decoder (“cab”) address
    vehicle_id TEXT, -- Vehicle identifyer for when multiple vehicles
