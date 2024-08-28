@@ -7,13 +7,13 @@ class Database(object):
     """
     Abstract base class for CV databases
     """
-    def store(self, cab:int, cvs:list[int], revision_comment=""):
+    def store_cvs(self, cab:int, cvs:list[int], revision_comment=""):
         raise NotImplementedError()
 
-    def get(self, cab:int, cv:int):
+    def get_cv(self, cab:int, cv:int):
         raise NotImplementedError()
 
-    def get_all(self, cab:int):
+    def get_cvs(self, cab:int):
         raise NotImplementedError()
 
 class CursorWrapper(object):
@@ -35,6 +35,13 @@ class Revision(object):
     address: int
     comment: str
     ctime: datetime.datetime
+
+@dataclasses.dataclass
+class Vehicle(object):
+    address: int
+    vehicle_id: str
+    identifyer: str
+    name: str
 
 class PostgresDatabase(Database):
     def __init__(self, params):
@@ -64,10 +71,26 @@ class PostgresDatabase(Database):
         cursor.execute(cmd, params)
         return cursor
 
+    def query(self, *query, cursor=None):
+        cursor = self.execute(*query, cursor=cursor)
+        return list(cursor.fetchall())
+
+    def query_one(self, *query, cursor=None):
+        result = self.query(*query, cursor=cursor)
+        if result:
+            tpl = result[0]
+            if len(tpl) == 1:
+                return tpl[0]
+            else:
+                return tpl
+        else:
+            return None
+
     def commit(self):
         self.ds.commit()
 
-    def store(self, cab:int, cvs:dict[int, int], revision_comment=""):
+    def store_cvs(self, vehicle:Vehicle,
+                  cvs:dict[int, int], revision_comment=""):
         # Remove None values from cvs
         cvs = dict([ (name, value)
                      for (name, value) in cvs.items()
@@ -77,7 +100,9 @@ class PostgresDatabase(Database):
 
         # Create a revision entry.
         cursor = self.execute(sql.insert.from_dict(
-            "revision", { "address": cab, "comment": revision_comment, }))
+            "revision", { "address": vehicle.address,
+                          "vehicle_id": vehicle.vehicle_id,
+                          "comment": revision_comment, }))
         cursor.execute("SELECT CURRVAL('revision_id_seq')")
         revision_id, = cursor.fetchone()
 
@@ -87,17 +112,17 @@ class PostgresDatabase(Database):
                         for ( cv, value ) in cvs.items() ]))
         self.commit()
 
-    def get(self, cab:int, cv:int):
+    def get_cv(self, vehicle:Vehicle, cv:int):
         """
-        Return the latest known entry for “cv” on “cab”.
+        Return the latest known entry for “cv” for “vehicle”.
         """
-        result = self.get_all(cab, cv)
+        result = self.get_all(vehicle, cv)
         return result.get(cv, None)
 
-    def get_all(self, cab:int, cv:int|None=None):
+    def get_all_cvs(self, vehicle:Vehicle, cv:int|None=None):
         """
-        Return the latest known CV settings on “cab” as a dict (optinally
-        limit the query to “cv”.)
+        Return the latest known CV settings on “vehicle” as a dict
+        (optinally limit the query to “cv”.)
         """
         query = """\
             WITH latest AS (
@@ -111,9 +136,9 @@ class PostgresDatabase(Database):
               LEFT JOIN value
                      ON latest.cv = value.cv
                     AND latest.revision_id = value.revision_id
-             WHERE address = %s
+             WHERE address = %s AND vehicle_id = %s
              ORDER BY cv"""
-        params = ( cab, )
+        params = ( vehicle.address, vehicle.vehicle_id, )
 
         if cv is not None:
             query += " AND cv = %s"
@@ -123,25 +148,26 @@ class PostgresDatabase(Database):
         cursor.execute(query, params)
         return dict(cursor.fetchall())
 
-    def get_revision(self, cab:int, revision_id:int):
+    def get_revision(self, vehicle:Vehicle, revision_id:int):
         """
-        Retrieve the latest know CV settings for “cab” at the time of
-        the identified revision.
+        Retrieve the latest know CV settings for “vehicle” at the
+        time of the identified revision.
         """
         query = """\
             WITH latest AS (
-                SELECT cv, address, MAX(revision_id) AS revision_id
+                SELECT cv, cab, vid
+                       MAX(revision_id) AS revision_id
                   FROM value
                   LEFT JOIN revision ON revision_id = revision.id
                   WHERE revision_id <= %s
-                  GROUP BY cv, address
+                  GROUP BY cv, address, vehicle_id
             )
             SELECT latest.cv, value
               FROM latest
               LEFT JOIN value
                      ON latest.cv = value.cv
                     AND latest.revision_id = value.revision_id
-             WHERE address = cab
+             WHERE address = cab AND vehicle_id = vid
              ORDER BY cv"""
         params = ( revision_id, cab, )
 
@@ -149,10 +175,57 @@ class PostgresDatabase(Database):
         cursor.execute(query, params)
         return dict(cursor.fetchall())
 
-    def get_revisions(self, cab:int):
+    def get_revisions(self, vehicle:Vehicle):
         cursor = self.cursor()
-        cursor.execute("SELECT id, address, comment, ctime "
+        cursor.execute("SELECT id, address, vehicle_id, comment, ctime "
                        "  FROM revision"
-                       " WHERE address = %s"
-                       " ORDER BY id ASC", ( cab, ))
+                       " WHERE address = %s AND vehicle_id = %s"
+                       " ORDER BY id ASC", ( vehicle.address,
+                                             vehicle.vehicle_id, ))
         return [ Revision(*tpl) for tpl in cursor.fetchall() ]
+
+    def vehicle_by_address(self, cab:int, vehicle_id:str):
+        result = self.query_vehicles(sql.where("address = %i " % cab,
+                                               "AND vehicle_id = ",
+                                               sql.string_literal(vehicle_id)))
+        if result:
+            return result[0]
+        else:
+            raise VehicleNotFound("Address:{cab} id:“{vehicle_id}”")
+
+    def vehicle_by_id(self, roster_id:str):
+        result = self.query_vehicles(sql.where("identifyer = ",
+                                               sql.string_literal(roster_id)))
+        if result:
+            return result[0]
+        else:
+            raise VehicleNotFound("ID:{roster_id}")
+
+    def query_vehicles(self, where, orderby="identifyer"):
+        query = sql.select( ("address", "vehicle_id", "identifyer", "name",),
+                            ("roster",),
+                            where, sql.orderby(orderby))
+        result = self.query(query)
+        return [ Vehicle(*tpl) for tpl in result ]
+
+    def create_roster_entry(self, identifyer:str,
+                            cab:int, vehicle_id:str,
+                            name:str):
+        cursor = self.execute(sql.insert.from_dict(
+            "roster", { "identifyer": identifyer,
+                        "address": cab,
+                        "vehicle_id": vehicle_id,
+                        "name": name, }))
+        self.commit()
+
+    def update_vehicle(self, vehicle, data):
+        where = sql.where("identifyer = ",
+                          sql.string_literal(vehicle.identifyer))
+        self.execute(sql.update("roster", where, data))
+        self.commit()
+
+    def delete_vehicle(self, vehicle):
+        where = sql.where("identifyer = ",
+                          sql.string_literal(vehicle.identifyer))
+        self.execute(sql.delete("roster", where))
+        self.commit()vc
