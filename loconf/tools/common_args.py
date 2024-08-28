@@ -1,7 +1,9 @@
 from .. import config
 import argparse
 
-def debug(parser:argparse.ArgumentParser, debug=True, com=True, sql=True):
+from loconf.utils import VehicleIdentifyer
+
+def add_debug(parser:argparse.ArgumentParser, debug=True, com=True, sql=True):
     if debug:
         parser.add_argument("-d", "--debug", action="store_true",
                             help="Output debug information to stderr.")
@@ -14,17 +16,19 @@ def debug(parser:argparse.ArgumentParser, debug=True, com=True, sql=True):
         parser.add_argument("-ds", "--sqldebug", action="store_true",
                             help="Output SQL commands and queries to stderr.")
 
-def cab(parser:argparse.ArgumentParser, help=None):
-    parser.add_argument("-c", "--cab", type=int, required=True,
-                        help=help or "Loco address (cab number).")
+def add_identification(parser:argparse.ArgumentParser, help=None):
+    parser.add_argument(
+        "vehicle", type=VehicleIdentifyer.parse,
+        help=help or "Vehicle identification by cap, cap:id, or "
+        "roster identifyer")
 
-def names_file(parser:argparse.ArgumentParser):
+def add_names_file(parser:argparse.ArgumentParser):
     parser.add_argument("-n", "--names-file", type=argparse.FileType('r'),
                         default=None, help="Read variable name definitions "
                         "from this file. These names will be used as left "
                         "hand operands as in “name” := “value”.")
 
-def revision_comment(parser:argparse.ArgumentParser):
+def add_revision_comment(parser:argparse.ArgumentParser):
     parser.add_argument("-C", "--revision-comment", default="",
                         help="Remarks stored in the database "
                         "along with the CVs read.")
