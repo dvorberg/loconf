@@ -10,7 +10,7 @@ from sqlclasses import sql
 from tabulate import tabulate
 
 from loconf import config, debug
-from loconf.utils import VehicleIdentifyer
+from loconf.utils import VehicleIdentifyer, print_vehicle_table
 from . import common_args
 
 def create(args):
@@ -20,7 +20,7 @@ def create(args):
                                         args.name)
 
 def update(args):
-    data = { "cab": args.cab,
+    data = { "address": args.cab,
              "vehicle_id": args.vehicle_id,
              "name": args.name,
              "identifyer": args.identifyer }
@@ -37,14 +37,8 @@ def delete(args):
     config.database.delete_vehicle(args.vehicle)
 
 def list_entries(args):
-    def cab(address, vehicle_id):
-        return f"{address}:{vehicle_id}"
-
     vehicles = config.database.query_vehicles(None)
-    print(tabulate([ (v.identifyer, cab(v.address, v.vehicle_id), v.name,)
-                     for v in vehicles ],
-                   headers=["Roster ID", "cab", "Name"],
-                   tablefmt='orgtbl'))
+    print_vehicle_table(vehicles)
     print()
 
 def main():
