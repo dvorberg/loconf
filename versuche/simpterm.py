@@ -88,7 +88,7 @@ class CommandStation(LineReader):
         self.wait_for(response_class, timeout)
 
 def main():
-    port = serial.serial_for_url("/dev/cu.usbmodem14701",
+    port = serial.serial_for_url("/dev/ttyUSB0",
                                  baudrate=115200, timeout=1)
 
     with ReaderThread(port, PrintLines) as reader_thread:
