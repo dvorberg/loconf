@@ -46,10 +46,7 @@ class VehicleIdentifyer(object):
 
             if cab is not None:
                 cab = int(cab)
-                count_on_cab = config.database.query_one(
-                    f"SELECT COUNT(address) FROM roster "
-                    f" WHERE address = {cab} "
-                    f" GROUP BY address ")
+                count_on_cab = dbcontrollers.vehicle_count_by_address()
                 if count_on_cab is None or count_on_cab == 0:
                     raise UnknownVehicle(s)
                 else:
@@ -62,9 +59,9 @@ class VehicleIdentifyer(object):
                                 f"“<cab>:” syntax.")
                         else:
                             vehicle_id = ""
-                    return config.database.vehicle_by_address(cab, vehicle_id)
+                    return dbcontrollers.vehicle_by_address(cab, vehicle_id)
             else:
-                return config.database.vehicle_by_id(roster_id)
+                return dbcontrollers.vehicle_by_id(roster_id)
 
 def print_vehicle_table(vehicles):
     def cab(address, vehicle_id):

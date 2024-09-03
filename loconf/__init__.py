@@ -51,7 +51,7 @@ class Configuration(object):
         return bool(self._confdata.get("comdebug", False))
 
     @functools.cached_property
-    def database(self):
+    def dbconn(self):
         entry = self._confdata["database"]
         if type(entry) is str:
             # The the string as a path and open it as some database
@@ -59,9 +59,9 @@ class Configuration(object):
             pass
         else:
             typ = entry.get("type", "none")
-            from . import database
+            from .database import connection
             if typ == "psycopg2":
-                return database.PostgresDatabase(entry.get("params"))
+                return connection.PostgresConnection(entry.get("params"))
             else:
                 raise ValueError(f"Unknown database type “{typ}”")
 

@@ -9,15 +9,15 @@ import sys, argparse, pathlib, re, datetime
 from sqlclasses import sql
 from tabulate import tabulate
 
-from loconf import config, debug
-from loconf.utils import VehicleIdentifyer, print_vehicle_table
+from ..database import controllers as db
+from ..utils import VehicleIdentifyer, print_vehicle_table
 from . import common_args
 
 def create(args):
-    config.database.create_roster_entry(args.identifyer,
-                                        args.cab,
-                                        args.vehicle_id,
-                                        args.name)
+    db.create_roster_entry(args.identifyer,
+                                      args.cab,
+                                      args.vehicle_id,
+                                      args.name)
 
 def update(args):
     data = { "address": args.cab,
@@ -31,13 +31,13 @@ def update(args):
     if len(data) == 0:
         raise ValueError("No values are to be changed.")
     else:
-        config.database.update_vehicle(args.vehicle, data)
+        db.update_vehicle(args.vehicle, data)
 
 def delete(args):
-    config.database.delete_vehicle(args.vehicle)
+    db.delete_vehicle(args.vehicle)
 
 def list_entries(args):
-    vehicles = config.database.query_vehicles(None)
+    vehicles = db.query_vehicles(None)
     print_vehicle_table(vehicles)
     print()
 

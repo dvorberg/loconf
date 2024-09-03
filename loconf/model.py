@@ -1,18 +1,13 @@
-import dataclasses, datetime
+#!/usr/bin/env python
 
-@dataclasses.dataclass
-class Revision(object):
-    id: int
-    address: int
-    comment: str
-    ctime: datetime.datetime
+from .database.object import dbobject
 
-@dataclasses.dataclass
-class Vehicle(object):
-    address: int
-    vehicle_id: str
-    identifyer: str
-    name: str
+class Revision(dbobject):
+    __relation__ = "revision"
+
+class Vehicle(dbobject):
+    __relation__ = "roster"
+    __primary_key__ = ( "address", "vehicle_id", )
 
     def __repr__(self):
         if self.vehicle_id:
