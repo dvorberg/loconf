@@ -105,6 +105,21 @@ class DCCEX_Station(Station):
             raise ReadFailed("Failed to read cab address from decoder.")
         return response.address
 
+    def writecab(self, cab:int) -> int|None:
+        """
+        Write the cab (DCC address) of the loco currently on the
+        programming track using “<W>”. Returns the address as an
+        integer or None on error.
+        """
+        assert cab > 1, "Cab address must be > 1."
+
+        response = self.communicate("<W %i>" % cab, responses.WriteAddress)
+
+        if response.address == -1 or response.address != cab:
+            raise ReadFailed(f"Failed to write cab address from decoder "
+                             f"({response.address}).")
+        return response.address
+
 
     def readcv(self, cv:int) -> int|None:
         """
