@@ -1,20 +1,12 @@
 include "../switch_commander_100901.loconf"
 
 A1_command := 3
-A1_dimming := 33
+A1_dimming := 100
 A1_condition := none
 
 A2_command := 3
-A2_dimming := 80
+A2_dimming := 30
 A2_condition := none
-
-A3_command := 3
-A3_dimming := 50
-A3_condition := none
-
-A4_command := 3
-A4_dimming := 33
-A4_condition := none
 
 
 A9_command := buffer_control
