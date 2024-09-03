@@ -1,6 +1,7 @@
 import re
-from . import config
+from tabulate import tabulate
 
+from . import config
 from .language.parser import Parser
 
 def read_names_file(fp):
@@ -64,3 +65,11 @@ class VehicleIdentifyer(object):
                     return config.database.vehicle_by_address(cab, vehicle_id)
             else:
                 return config.database.vehicle_by_id(roster_id)
+
+def print_vehicle_table(vehicles):
+    def cab(address, vehicle_id):
+        return f"{address}:{vehicle_id}"
+    print(tabulate([ (v.identifyer, cab(v.address, v.vehicle_id), v.name,)
+                     for v in vehicles ],
+                   headers=["Roster ID", "cab", "Name"],
+                   tablefmt='orgtbl'))
