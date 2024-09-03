@@ -1,13 +1,13 @@
-import dataclasses, datetime
 from sqlclasses import sql
 
 from . import config, sqldebug
+from .model import Revision, Vehicle
 
 class Database(object):
     """
     Abstract base class for CV databases
     """
-    def store_cvs(self, cab:int, cvs:list[int], revision_comment=""):
+    def store_cvs(self, vehicle:Vehicle, cvs:list[int], revision_comment=""):
         raise NotImplementedError()
 
     def get_cv(self, cab:int, cv:int):
@@ -28,20 +28,6 @@ class CursorWrapper(object):
 
     def __getattr__(self, name):
         return getattr(self.cursor, name)
-
-@dataclasses.dataclass
-class Revision(object):
-    id: int
-    address: int
-    comment: str
-    ctime: datetime.datetime
-
-@dataclasses.dataclass
-class Vehicle(object):
-    address: int
-    vehicle_id: str
-    identifyer: str
-    name: str
 
 class PostgresDatabase(Database):
     def __init__(self, params):
@@ -126,10 +112,10 @@ class PostgresDatabase(Database):
         """
         query = """\
             WITH latest AS (
-                SELECT cv, address, MAX(revision_id) AS revision_id
+                SELECT cv, address, vehicle_id, MAX(revision_id) AS revision_id
                   FROM value
                   LEFT JOIN revision ON revision_id = revision.id
-                  GROUP BY cv, address
+                  GROUP BY cv, address, vehicle_id
             )
             SELECT latest.cv, value
               FROM latest
@@ -228,4 +214,4 @@ class PostgresDatabase(Database):
         where = sql.where("identifyer = ",
                           sql.string_literal(vehicle.identifyer))
         self.execute(sql.delete("roster", where))
-        self.commit()vc
+        self.commit()
