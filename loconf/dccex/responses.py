@@ -101,9 +101,16 @@ class WriteCV(Response):
 
 class ReadAddress(Response):
     """
-    <R>: Request the address of the engine on the programming track.
+    <r>: Request the address of the engine on the programming track.
     """
     regex = re.compile(r"<r (?P<address>-?\d+)>")
+    address: int
+
+class WriteAddress(Response):
+    """
+    <w>: Request the address of the engine on the programming track.
+    """
+    regex = re.compile(r"<w (?P<address>-?\d+)>")
     address: int
 
 class ReadCVplus(Response):
