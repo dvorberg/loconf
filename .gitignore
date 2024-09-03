@@ -1,4 +1,5 @@
 virtualenv
+.virtualenv.nosync.noindex
 .virtualenv.leela.nosync.noindex
 .virtualenv.trainpi.nosync.noindex
 *.pyc
