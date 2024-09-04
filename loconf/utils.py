@@ -3,7 +3,6 @@ from tabulate import tabulate
 
 from . import config
 from .language.parser import Parser
-from .database.controllers import vehicle_by_id, vehicle_by_address
 
 def read_names_file(fp):
     parser = Parser()
@@ -39,6 +38,9 @@ class VehicleIdentifyer(object):
                        from the database.
         Vehicle and roster IDs must not contain space characters.
         """
+        from .database.controllers import (vehicle_by_id, vehicle_by_address,
+                                           vehicle_count_by_address)
+
         match = cls.vehicle_identifyer_re.match(s)
         if match is None:
             raise VehicleIdentifyerParseError(s)
@@ -47,7 +49,7 @@ class VehicleIdentifyer(object):
 
             if cab is not None:
                 cab = int(cab)
-                count_on_cab = dbcontrollers.vehicle_count_by_address()
+                count_on_cab = vehicle_count_by_address(cab)
                 if count_on_cab is None or count_on_cab == 0:
                     raise UnknownVehicle(s)
                 else:
@@ -64,10 +66,10 @@ class VehicleIdentifyer(object):
             else:
                 return vehicle_by_id(roster_id)
 
+    def __repr__(self):
+        return f"{self.cab}:{self.vehicle_id}"
+
 def print_vehicle_table(vehicles):
-    def cab(address, vehicle_id):
-        return f"{address}:{vehicle_id}"
-    print(tabulate([ (v.identifyer, cab(v.address, v.vehicle_id), v.name,)
-                     for v in vehicles ],
-                   headers=["Roster ID", "cab", "Name"],
+    print(tabulate([ (v.nickname, v.id, v.designation,) for v in vehicles ],
+                   headers=["Nickname", "Cab:id", "Designation"],
                    tablefmt='orgtbl'))
