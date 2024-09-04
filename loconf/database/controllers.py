@@ -13,15 +13,12 @@ def store_cvs(vehicle:Vehicle,
         return
 
     # Create a revision entry.
-    revision_id = config.dbconn.insert_from_dict(
-        model.revision,
-        {"address": vehicle.address,
-         "vehicle_id": vehicle.vehicle_id,
-         "comment": revision_comment, })
-
+    revision = Revision.insert_from_dict( {"address": vehicle.address,
+                                           "vehicle_id": vehicle.vehicle_id,
+                                           "comment": revision_comment, })
     # Create value entries for each of the CVs.
     self.execute(sql.insert.from_dict(
-        "value", *[ {"revision_id": revision_id, "cv": cv, "value": value}
+        "value", *[ {"revision_id": revision.id, "cv": cv, "value": value}
                     for ( cv, value ) in cvs.items() ]))
     self.commit()
 
@@ -118,24 +115,24 @@ def query_vehicles(where, orderby="identifyer"):
 def create_roster_entry(identifyer:str,
                         cab:int, vehicle_id:str,
                         name:str):
-    config.dbconn.insert_from_dict(Vehicle,
-                                   { "identifyer": identifyer,
-                                     "address": cab,
-                                     "vehicle_id": vehicle_id,
-                                     "name": name, })
-    self.commit()
+    Vehicle.insert_from_dict({ "identifyer": identifyer,
+                               "address": cab,
+                               "vehicle_id": vehicle_id,
+                               "name": name, },
+                             retrieve_id=False)
+    config.dbconn.commit()
 
 def update_vehicle(vehicle:Vehicle, data:dict):
     where = sql.where("identifyer = ",
                       sql.string_literal(vehicle.identifyer))
-    self.execute(sql.update("roster", where, data))
-    self.commit()
+    config.dbconn.execute(sql.update("roster", where, data))
+    config.dbconn.commit()
 
 def delete_vehicle(vehicle:Vehicle):
     where = sql.where("identifyer = ",
                       sql.string_literal(vehicle.identifyer))
-    self.execute(sql.delete("roster", where))
-    self.commit()
+    config.dbconn.execute(sql.delete("roster", where))
+    config.dbconn.commit()
 
 def vehicle_count_by_address(address:int):
     return config.dbconn.query_one(f"SELECT COUNT(address) FROM roster "
