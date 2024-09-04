@@ -10,20 +10,28 @@ from sqlclasses import sql
 from tabulate import tabulate
 
 from ..database import controllers as db
-from ..utils import VehicleIdentifyer, print_vehicle_table
+from ..utils import (VehicleIdentifyer, VehicleIdentifyerParseError,
+                     print_vehicle_table)
 from . import common_args
 
+vehicle_re = re.compile(r"(\d+)(?::(\w*))")
 def create(args):
-    db.create_roster_entry(args.identifyer,
-                                      args.cab,
-                                      args.vehicle_id,
-                                      args.name)
+    match = vehicle_re.match(args.vehicle)
+    if match is None:
+        raise VehicleIdentifyerParseError(args.vehicle)
+    else:
+        cab, vehicle_id = match.groups()
+
+    db.create_roster_entry(args.nickname,
+                           cab,
+                           vehicle_id,
+                           args.designation)
 
 def update(args):
     data = { "address": args.cab,
              "vehicle_id": args.vehicle_id,
-             "name": args.name,
-             "identifyer": args.identifyer }
+             "designation": args.designation,
+             "nickname": args.nickname }
 
     # Filter out None and empty values.
     data = dict([ (n, v) for (n, v) in data.items() if v])
@@ -50,15 +58,13 @@ def main():
 
     # Create
     cp = subparsers.add_parser("create", help="Create roster entry")
-    cp.add_argument("identifyer", help="Text identifyer for this roster entry "
+    cp.add_argument("-d", "--designation", default="",
+                    help="Vehicle designation for pretty printing")
+    cp.add_argument("vehicle",
+                    help="Vehicle identification by decoder (“cab”) address "
+                    "or cab:id")
+    cp.add_argument("nickname", help="Text nickname for this roster entry "
                     "to be used on the command line")
-    cp.add_argument("-c", "--cab", type=int, required=True,
-                    help="Decoder address (cab number).")
-    cp.add_argument("-V", "--vehicle-id", type=str, default="",
-                    help="Secondary vehicle identifyer if several "
-                    "vehicles share one decoder (“cap”) address")
-    cp.add_argument("-n", "--name", default="",
-                    help="Vehicle name for pretty printing")
     cp.set_defaults(func=create)
 
     # Update
@@ -69,10 +75,10 @@ def main():
     cp.add_argument("-V", "--vehicle-id", type=str, default="",
                     help="Secondary vehicle identifyer if several "
                     "vehicles share one decoder (“cap”) address")
-    cp.add_argument("-i", "--identifyer", default=None,
+    cp.add_argument("-n", "--nickname", default=None,
                     help="Roster identifyer")
-    cp.add_argument("-n", "--name", default=None,
-                    help="Vehicle name for pretty printing")
+    cp.add_argument("-d", "--designation", default=None,
+                    help="Vehicle designation for pretty printing")
     cp.set_defaults(func=update)
 
     # Delete
