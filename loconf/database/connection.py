@@ -95,7 +95,7 @@ class PostgresConnection(DatabaseConnection):
             else:
                 return dbobject_class(cc.description, tpl)
 
-    def query_one(command, parameters=()):
+    def query_one(self, command, parameters=()):
         if isinstance(command, sql.Part):
             if parameters:
                 raise ValueError("Can’t provide parameters with "
