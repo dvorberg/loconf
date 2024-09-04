@@ -1,7 +1,10 @@
+import sys, traceback
+
 from .. import config
 import argparse
 
-from loconf.utils import VehicleIdentifyer
+from loconf.utils import (VehicleIdentifyer, VehicleIdentifyerParseError,
+                          UnknownVehicle, AmbiguousAddress)
 
 def add_debug(parser:argparse.ArgumentParser, debug=True, com=True, sql=True):
     if debug:
@@ -17,10 +20,22 @@ def add_debug(parser:argparse.ArgumentParser, debug=True, com=True, sql=True):
                             help="Output SQL commands and queries to stderr.")
 
 def add_identification(parser:argparse.ArgumentParser, help=None):
+    def vehicle_from_id(s):
+        try:
+            return VehicleIdentifyer.parse(s)
+        except (VehicleIdentifyerParseError, UnknownVehicle,
+                AmbiguousAddress) as e:
+            parser.error(str(e))
+        except Exception as e:
+            print("Exception during argument parsing:\n",
+                  "".join(traceback.format_tb(e.__traceback__)),
+                  file=sys.stderr, sep="")
+            sys.exit(-1)
+
     parser.add_argument(
-        "vehicle", type=VehicleIdentifyer.parse,
-        help=help or "Vehicle identification by cap, cap:id, or "
-        "roster identifyer")
+        "vehicle", type=vehicle_from_id,
+        help=help or "Vehicle identification by decoder address (“cab”), "
+        "cab:id, or nickname")
 
 def add_names_file(parser:argparse.ArgumentParser):
     parser.add_argument("-n", "--names-file", type=argparse.FileType('r'),
