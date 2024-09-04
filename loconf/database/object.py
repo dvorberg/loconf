@@ -158,7 +158,7 @@ class dbobject(object, metaclass=SQLRepresentation):
     def empty(cls):
         query = cls.select_query(sql.where("false"))
         with config.dbconn.cursor() as c:
-            query, params = rollup_sql(query)
+            query, params = config.dbconn.backend.rollup(query)
             c.execute(query, params)
             values = []
             for a in c.description:
@@ -168,7 +168,7 @@ class dbobject(object, metaclass=SQLRepresentation):
     @classmethod
     def count(cls, *clauses):
         query = sql.select("COUNT(*)", [cls.__view__,], *clauses)
-        query, params = rollup_sql(query)
+        query, params = config.dbconn.backend(query)
         with config.dbconn.cursor() as cc:
             cc.execute(query, params)
             count, = cc.fetchone()
@@ -178,7 +178,7 @@ class dbobject(object, metaclass=SQLRepresentation):
     def select(cls, *clauses):
         with config.dbconn.cursor() as c:
             query = cls.select_query(*clauses)
-            query, params = rollup_sql(query)
+            query, params = config.dbconn.backend.rollup(query)
             c.execute(query, params)
             return cls.__result_class__(c, cls, clauses)
 
@@ -200,3 +200,13 @@ class dbobject(object, metaclass=SQLRepresentation):
             return None
         else:
             return result[0]
+
+    @classmethod
+    def insert_from_dict(cls, d, retrieve_id=True, sequence_name=None):
+        id = config.dbconn.insert_from_dict(cls.__relation__, d,
+                                            retrieve_id=retrieve_id,
+                                            sequence_name=sequence_name)
+        if retrieve_id:
+            d[cls.__primary_key_column__] = id
+
+        return cls.from_dict(d)
