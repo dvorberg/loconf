@@ -1,3 +1,4 @@
+from termcolor import colored
 from sqlclasses import sql
 
 from .. import config, sqldebug
@@ -62,7 +63,7 @@ class PostgresConnection(DatabaseConnection):
             if parameters:
                 raise ValueError("Can’t provide parameters with  "
                                  "sqlclasses.sql statement.")
-            command, parameters = rollup_sql(command)
+            command, parameters = self.backend.rollup(command)
 
         cc = self.cursor()
         cc.execute(command, parameters)
@@ -73,7 +74,7 @@ class PostgresConnection(DatabaseConnection):
             if parameters:
                 raise ValueError("Can’t provide parameters with "
                                  "sqlclasses.sql statement.")
-            command, parameters = rollup_sql(command)
+            command, parameters = self.backend.rollup(command)
 
         with self.cursor() as cc:
             cc.execute(command, parameters)
@@ -84,7 +85,7 @@ class PostgresConnection(DatabaseConnection):
             if parameters:
                 raise ValueError("Can’t provide parameters with "
                                  "sqlclasses.sql statement.")
-            command, parameters = rollup_sql(command)
+            command, parameters = self.backend.rollup(command)
 
         with self.cursor() as cc:
             cc.execute(command, parameters)
@@ -99,7 +100,7 @@ class PostgresConnection(DatabaseConnection):
             if parameters:
                 raise ValueError("Can’t provide parameters with "
                                  "sqlclasses.sql statement.")
-            command, parameters = rollup_sql(command)
+            command, parameters = self.backend.rollup(command)
 
         with self.cursor() as cc:
             cc.execute(command, parameters)
@@ -119,7 +120,7 @@ class PostgresConnection(DatabaseConnection):
         command = sql.insert(relation, list(d.keys()), [ d, ])
 
         with self.cursor() as cc:
-            command, params = rollup_sql(command)
+            command, params = self.backend.rollup(command)
             cc.execute(command, params)
 
             if not "id" in d and retrieve_id:
@@ -128,7 +129,7 @@ class PostgresConnection(DatabaseConnection):
                         name = relation.name.name
                     else:
                         name = str(relation)
-                        seqence_name = '%s_id_seq' % name
+                    sequence_name = '%s_id_seq' % name
 
                 cc.execute("SELECT CURRVAL('%s')" % sequence_name)
                 id, = cc.fetchone()
