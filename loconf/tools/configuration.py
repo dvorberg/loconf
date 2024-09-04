@@ -13,7 +13,7 @@ from .. import config, debug
 from ..utils import VehicleIdentifyer, print_vehicle_table
 from ..language import parse_file as parse_loconf_file
 from ..station import StationException
-from .. import dbcontrollers
+from ..database.controllers import store_cvs, get_all_cvs, query_vehicles
 from . import common_args
 
 class CabAddressMismatch(Exception):
@@ -87,8 +87,8 @@ def readcvs(args):
     finally:
         # Store the read cvs in the database.
         if not args.dont_update:
-            dbcontrollers.store_cvs(args.vehicle, to_be_stored,
-                                    args.revision_comment)
+            store_cvs(args.vehicle, to_be_stored,
+                      args.revision_comment)
 
 def writecvs(args):
     # Get the CV revision to be written from the input file.
@@ -98,7 +98,7 @@ def writecvs(args):
     if args.all:
         db_cvs = {}
     else:
-        db_cvs = dbcontrollers.get_all_cvs(args.vehicle)
+        db_cvs = get_all_cvs(args.vehicle)
 
     # Compile a list of CVs that need to be written.
     write_cvs = {}
@@ -138,8 +138,8 @@ def writecvs(args):
             raise
         finally:
             if not args.dont_update:
-                dbcontrollers.store_cvs(args.vehicle, to_be_stored,
-                                        args.revision_comment)
+                store_cvs(args.vehicle, to_be_stored,
+                          args.revision_comment)
 
 
 def listrevs(args):
@@ -152,7 +152,7 @@ def readcab(args):
     cab = config.station.readcab()
     print("Found:", cab)
 
-    vehicles = dbcontrollers.query_vehicles(sql.where("address = %i" % cab))
+    vehicles = query_vehicles(sql.where("address = %i" % cab))
     if len(vehicles) == 0:
         print("No vehicles with on the roster with address %i." % cab)
     else:
