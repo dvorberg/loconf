@@ -7,7 +7,11 @@ class Revision(dbobject):
 
 class Vehicle(dbobject):
     __relation__ = "roster"
-    __primary_key__ = ( "address", "vehicle_id", )
+
+    # The primary key in the database is (address, vehicle_id). My miniorm
+    # can’t do that. The identifyer column is unique, though, and may stand
+    # in for the “real” primary key here.
+    __primary_key_column__ = ( "identifyer", )
 
     def __repr__(self):
         if self.vehicle_id:
