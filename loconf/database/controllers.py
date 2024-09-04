@@ -17,10 +17,10 @@ def store_cvs(vehicle:Vehicle,
                                            "vehicle_id": vehicle.vehicle_id,
                                            "comment": revision_comment, })
     # Create value entries for each of the CVs.
-    self.execute(sql.insert.from_dict(
+    config.dbconn.execute(sql.insert.from_dict(
         "value", *[ {"revision_id": revision.id, "cv": cv, "value": value}
                     for ( cv, value ) in cvs.items() ]))
-    self.commit()
+    config.dbconn.commit()
 
 def get_cv(vehicle:Vehicle, cv:int):
     """
@@ -102,35 +102,35 @@ def vehicle_by_address(cab:int, vehicle_id:str):
         raise VehicleNotFound("Address:{cab} id:“{vehicle_id}”")
 
 def vehicle_by_id(roster_id:str):
-    result = query_vehicles(sql.where("identifyer = ",
+    result = query_vehicles(sql.where("nickname = ",
                                       sql.string_literal(roster_id)))
     if result:
         return result[0]
     else:
         raise VehicleNotFound("ID:{roster_id}")
 
-def query_vehicles(where, orderby="identifyer"):
+def query_vehicles(where, orderby="nickname"):
     return Vehicle.select(where, sql.orderby(orderby))
 
-def create_roster_entry(identifyer:str,
+def create_roster_entry(nickname:str,
                         cab:int, vehicle_id:str,
-                        name:str):
-    Vehicle.insert_from_dict({ "identifyer": identifyer,
+                        designation:str):
+    Vehicle.insert_from_dict({ "nickname": nickname,
                                "address": cab,
                                "vehicle_id": vehicle_id,
-                               "name": name, },
+                               "designation": designation, },
                              retrieve_id=False)
     config.dbconn.commit()
 
 def update_vehicle(vehicle:Vehicle, data:dict):
-    where = sql.where("identifyer = ",
-                      sql.string_literal(vehicle.identifyer))
+    where = sql.where("nickname = ",
+                      sql.string_literal(vehicle.nickname))
     config.dbconn.execute(sql.update("roster", where, data))
     config.dbconn.commit()
 
 def delete_vehicle(vehicle:Vehicle):
-    where = sql.where("identifyer = ",
-                      sql.string_literal(vehicle.identifyer))
+    where = sql.where("nickname = ",
+                      sql.string_literal(vehicle.nickname))
     config.dbconn.execute(sql.delete("roster", where))
     config.dbconn.commit()
 
