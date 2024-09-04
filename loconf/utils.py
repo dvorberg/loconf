@@ -3,6 +3,7 @@ from tabulate import tabulate
 
 from . import config
 from .language.parser import Parser
+from .database.controllers import vehicle_by_id, vehicle_by_address
 
 def read_names_file(fp):
     parser = Parser()
@@ -59,9 +60,9 @@ class VehicleIdentifyer(object):
                                 f"“<cab>:” syntax.")
                         else:
                             vehicle_id = ""
-                    return dbcontrollers.vehicle_by_address(cab, vehicle_id)
+                    return vehicle_by_address(cab, vehicle_id)
             else:
-                return dbcontrollers.vehicle_by_id(roster_id)
+                return vehicle_by_id(roster_id)
 
 def print_vehicle_table(vehicles):
     def cab(address, vehicle_id):
