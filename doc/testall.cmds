@@ -1,0 +1,139 @@
+# Turn track power on and synchronize the programming track.
+1
+1 JOIN
+
+# Configure turnout 1
+T 21 DCC 21
+T 22 DCC 22
+T 23 DCC 23
+T 24 DCC 24
+T 25 DCC 25
+T 26 DCC 26
+T 27 DCC 27
+T 28 DCC 28
+
+T 29 DCC 29
+T 30 DCC 30
+T 31 DCC 31
+T 32 DCC 32
+
+# Turnout 21
+T 21 1
+sleep .5
+T 21 0
+sleep .5
+T 21 1
+sleep .5
+T 21 0
+sleep .5
+
+# Turnout 22
+T 22 1
+sleep .5
+T 22 0
+sleep .5
+T 22 1
+sleep .5
+T 22 0
+sleep .5
+
+# Turnout 23
+T 23 1
+sleep .5
+T 23 0
+sleep .5
+T 23 1
+sleep .5
+T 23 0
+sleep .5
+
+# Turnout 24
+T 24 1
+sleep .5
+T 24 0
+sleep .5
+T 24 1
+sleep .5
+T 24 0
+sleep .5
+
+# Turnout 25
+T 25 1
+sleep .5
+T 25 0
+sleep .5
+T 25 1
+sleep .5
+T 25 0
+sleep .5
+
+# Turnout 26
+T 26 1
+sleep .5
+T 26 0
+sleep .5
+T 26 1
+sleep .5
+T 26 0
+sleep .5
+
+# Turnout 27
+T 27 1
+sleep .5
+T 27 0
+sleep .5
+T 27 1
+sleep .5
+T 27 0
+sleep .5
+
+# Turnout 28
+T 28 1
+sleep .5
+T 28 0
+sleep .5
+T 28 1
+sleep .5
+T 28 0
+sleep .5
+
+# Turnout 29
+T 29 1
+sleep .5
+T 29 0
+sleep .5
+T 29 1
+sleep .5
+T 29 0
+sleep .5
+
+# Turnout 30
+T 30 1
+sleep .5
+T 30 0
+sleep .5
+T 30 1
+sleep .5
+T 30 0
+sleep .5
+
+# Turnout 31
+T 31 1
+sleep .5
+T 31 0
+sleep .5
+T 31 1
+sleep .5
+T 31 0
+sleep .5
+
+# Turnout 32
+T 32 1
+sleep .5
+T 32 0
+sleep .5
+T 32 1
+sleep .5
+T 32 0
+sleep .5
+

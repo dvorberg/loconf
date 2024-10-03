@@ -1,0 +1,17 @@
+# Turn track power on and synchronize the programming track.
+1
+1 JOIN
+
+# Configure turnout 1
+T 1 DCC 29
+
+# Test turnout 1
+T 1 1
+sleep 1
+T 1 0
+sleep 1
+T 1 1
+sleep 1
+T 1 0
+sleep 1
+

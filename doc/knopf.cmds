@@ -1,0 +1,45 @@
+W 8 8
+
+1
+1 JOIN
+
+sleep 5
+
+T 1 DCC 21
+T 1 1
+
+sleep 3
+
+T 2 DCC 22
+T 2 1
+
+sleep 2
+
+T 3 DCC 23
+T 3 1
+
+sleep 3
+
+T 4 DCC 24
+T 4 1
+
+sleep 3
+
+T 5 DCC 25
+T 5 1
+
+sleep 3
+
+T 6 DCC 26
+T 6 1
+
+sleep 3
+
+T 7 DCC 27
+T 7 1
+
+sleep 3
+
+T 8 DCC 28
+T 8 1
+

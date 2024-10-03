@@ -1,0 +1,32 @@
+Der WD 34 von Tams benutzt das Adresse/Subadresse-Schema. Der Wert in
+CV 1 (ggF. mit CV 9) ist die Adresse. Subadresse ist immer 0.
+
+Die Lineare Adresse wird so berechnet:
+
+    (Adresse-1) * 4 + 1 + Subadresse
+
+Beispiel:
+
+    Adresse ist 30 (CV 1 = 30, CV 9 = 0)
+
+    (30-1)*4+1 + 0 = 117
+
+Will man also die Adresse des erste Kanals setzen ergibt sich die Formel:
+
+    (a - 1) // 4 + 1
+
+Da das Integer-Division ist, können sinnvoll nur Adressen gewählt
+werden, für die a-1 durch 4 teilbar ist. 
+
+Der Decoderwerk 30802 ist ganz komisch. Er benutzt lineare Adressen
+für die CVs. Die Adressen muss aber immer +3 gerechnet
+werden. Beispiel: Die Adresse von Kanal 1 gehört in CV 40. Ich will,
+dass die Adresse 21 ist.
+
+   CV 40 := 24
+
+Dann reagiert mein Kanal auf Adresse 21 (linear). Kann ich auch nichts zu.
+
+
+
+
