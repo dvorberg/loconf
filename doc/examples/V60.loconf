@@ -2,8 +2,8 @@
 
 include "lok_commander_2a_variables.loconf"
 
-Vmax := 129
 Vmin := 63
+Vmax := 129
 
 lf_command := 0
 lf_dimming := 228

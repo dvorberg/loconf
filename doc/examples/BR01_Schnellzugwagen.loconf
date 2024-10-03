@@ -16,6 +16,6 @@ A4_command := 3
 A4_dimming := 33
 A4_condition := none
 
-
-A9_command := buffer_control
+buffer_time := 255
+A9_special := buffer_control
 
