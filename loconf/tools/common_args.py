@@ -23,9 +23,12 @@ def add_identification(parser:argparse.ArgumentParser, help=None):
     def vehicle_from_id(s):
         try:
             return VehicleIdentifyer.parse(s)
-        except (VehicleIdentifyerParseError, UnknownVehicle,
-                AmbiguousAddress) as e:
-            parser.error(str(e))
+        except VehicleIdentifyerParseError as e:
+            parser.error("Incorrect nickname or identification: " + str(e))
+        except AmbiguousAddress as e:
+            parser.error("Ambigious vehicle id: “" + str(e) + "”")
+        except UnknownVehicle as e:
+            parser.error("Unknown vehicle: “" + str(e) + "”")
         except Exception as e:
             print("Exception during argument parsing:\n",
                   "".join(traceback.format_tb(e.__traceback__)),
