@@ -54,7 +54,7 @@ def get_all_cvs(vehicle:Vehicle, cv:int|None=None):
         query += " AND cv = %s"
         params += ( cv, )
 
-    cursor = cursor.execute(query, params)
+    cursor = config.dbconn.execute(query, params)
     return dict(cursor.fetchall())
 
 def get_revision(vehicle:Vehicle, revision_id:int):
