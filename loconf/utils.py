@@ -1,7 +1,7 @@
 import re
 from tabulate import tabulate
 
-from . import config
+from . import config, debug
 from .language.parser import Parser
 
 def read_names_file(fp):
@@ -25,7 +25,7 @@ class VehicleIdentifyer(object):
         self.cab = cab
         self.vehicle_id = vehicle_id
 
-    vehicle_identifyer_re = re.compile(r"(\d+)(?::(\w*))?|(\w+)")
+    vehicle_identifyer_re = re.compile(r"^(\d+)(?::(\w*))?$|^(\w+)$")
     @classmethod
     def parse(cls, s:str):
         """
@@ -73,3 +73,22 @@ def print_vehicle_table(vehicles):
     print(tabulate([ (v.nickname, v.id, v.designation,) for v in vehicles ],
                    headers=["Nickname", "Cab:id", "Designation"],
                    tablefmt='orgtbl'))
+
+class CabAddressMismatch(Exception):
+    pass
+
+def verify_vehicle(vehicle):
+    """
+    Make sure the vehicle on the programming track is the one the user
+    wants, i.e. stated on the command line. Raises CabAddressMismatch.
+    """
+    # Now go ahead and write the CVs to the decoder.
+    # First off: Verify CAB number.
+    debug("Reading decoder address …", end=" ")
+    found_cab = config.station.readcab()
+    if vehicle.address != found_cab:
+        debug()
+        raise CabAddressMismatch(f"Expected {vehicle} but found "
+                                 f"address {found_cab}!")
+    else:
+        debug("verified!", color="green")
