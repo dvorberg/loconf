@@ -1,0 +1,8 @@
+include "../standard_defs.loconf" 
+
+accTime := 2
+decTime := 2
+
+29 := [ 0 # Reverse direction
+      ]
+
