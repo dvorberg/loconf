@@ -20,7 +20,7 @@ class ReadFailed(StationException):
     """
 
 class DCCEX_Station(Station):
-    def __init__(self, port_url, boudrate=115200, default_line_timeout=8):
+    def __init__(self, port_url, boudrate=115200, default_line_timeout=1):
         self._ready = False
         debug(f"Connecting to station on {port_url}…", end=" ")
         self.serial_port = serial.serial_for_url(port_url, boudrate)
@@ -158,23 +158,24 @@ if __name__ == "__main__":
             self.user_has_canceled = False
 
         def run(self):
-            self.last_response = self.last_cmd_response = time.time()
+            self.last_response = self.last_cmd_response = 0
 
             while not self.user_has_canceled:
                 line = config.station.port.readline().rstrip()
+                self.last_response += 1
 
                 if line == "": # Timeout
-                    time.sleep(.2)
+                    time.sleep(.02)
                 else:
-                    self.last_response = time.time()
+                    self.last_response = self.last_response
                     if line == "<X>":
                         color = "red"
-                        self.last_cmd_response = time.time()
+                        self.last_cmd_response = self.last_response
                     elif line.startswith("<*"):
                         color = "light_grey"
                     else:
                         color = "green"
-                        self.last_cmd_response = time.time()
+                        self.last_cmd_response = self.last_response
 
                     comdebug(line, color=color)
 
@@ -185,8 +186,11 @@ if __name__ == "__main__":
 
     def main():
         parser = argparse.ArgumentParser()
-        parser.add_argument("infile", type=argparse.FileType("r"))
+        parser.add_argument("infiles", type=argparse.FileType("r"),
+                            nargs="*")
         args = parser.parse_args()
+
+        config.station.line_timeout = .03
 
         reader_thread = ReaderThread()
         reader_thread.start()
@@ -223,6 +227,7 @@ if __name__ == "__main__":
                     # A line to be sent to the command station.
                     cmd = f"<{line}>"
                     comdebug(cmd, color="black")
+
                     last_cmd_response = reader_thread.last_cmd_response
                     config.station.print(cmd)
 
@@ -232,7 +237,6 @@ if __name__ == "__main__":
                         counter += 1
                         if counter > 20:
                             break
-
                 else:
                     # A meta command.
                     groups = match.groupdict()
@@ -241,8 +245,9 @@ if __name__ == "__main__":
                         time.sleep(t)
 
 
-        for line in args.infile.readlines():
-            process_line(line)
+        for infile in args.infiles:
+            for line in infile.readlines():
+                process_line(line)
 
         while True:
             print("=>", end=" ")
