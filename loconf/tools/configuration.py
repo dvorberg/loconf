@@ -10,14 +10,13 @@ from sqlclasses import sql
 from tabulate import tabulate
 
 from .. import config, debug
-from ..utils import VehicleIdentifyer, print_vehicle_table
+from ..utils import ( VehicleIdentifyer, print_vehicle_table,
+                      verify_vehicle, CabAddressMismatch, )
 from ..language import parse_file as parse_loconf_file
 from ..station import StationException
 from ..database.controllers import store_cvs, get_all_cvs, query_vehicles
+from ..model import Vehicle
 from . import common_args
-
-class CabAddressMismatch(Exception):
-    pass
 
 def readcvs(args):
     cv_re = re.compile(r"(\d+)[-–](\d+)|(\d+)")
@@ -55,22 +54,13 @@ def readcvs(args):
 
     cvs = sorted(list(set(ranges())))
 
-    station = config.station
-
-    debug("Reading cab number…", end=" ")
-    found_cab = station.readcab()
-    if args.vehicle.address != found_cab:
-        debug()
-        raise CabAddressMismatch(f"Expected cab {args.vehicle.address} "
-                                 f"but found {found_cab}!")
-    else:
-        debug("verified!", color="green")
+    verify_vehicle(args.Vehicle)
 
     to_be_stored = {}
     try:
         for cv in cvs:
             debug("Reading CV", cv, end=" ")
-            value = station.readcv(cv)
+            value = config.station.readcv(cv)
 
             if cv in names:
                 left_hand = names[cv]
@@ -116,16 +106,7 @@ def writecvs(args):
         print("No changed CVs found. Input file is identical to latest "
               "database revision.", file=sys.stderr)
     else:
-        # Now go ahead and write the CVs to the decoder.
-        # First off: Verify CAB number.
-        debug("Reading decoder address …", end=" ")
-        found_cab = config.station.readcab()
-        if args.vehicle.address != found_cab:
-            debug()
-            raise CabAddressMismatch(f"Expected {args.vehicle} but found "
-                                     f"address {found_cab}!")
-        else:
-            debug("verified!", color="green")
+        verify_vehicle(args.vehicle)
 
         # Write phase.
         to_be_stored = {}
@@ -172,6 +153,10 @@ def writecab(args):
                                      f"required.")
 
     config.station.writecab(args.new)
+
+def reset(args):
+    verify_vehicle(args.vehicle)
+    config.station.writecv(8, args.value)
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -238,7 +223,16 @@ def main():
     cp.add_argument("new", type=int, help="New decoder (“cab”) address for the "
                     "vehicle on the programming track.")
 
-
+    cp = subparsers.add_parser("reset",
+                               help="Write to CV 8 which resets the decoder. "
+                               "This will likely reset the address (“cab”) on the "
+                               "decoder to the default value (3?) but not affect "
+                               "loconf’s database or configuration revisions "
+                               "associated with the current address.")
+    cp.set_defaults(func=reset)
+    common_args.add_identification(cp)
+    cp.add_argument("-V", "--value", type=int, default=8,
+                    help="Value to write to CV 8. Defaults to 8.")
 
     args = parser.parse_args()
     common_args.set_debug_config(args)
