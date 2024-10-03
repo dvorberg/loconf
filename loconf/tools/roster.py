@@ -14,13 +14,15 @@ from ..utils import (VehicleIdentifyer, VehicleIdentifyerParseError,
                      print_vehicle_table)
 from . import common_args
 
-vehicle_re = re.compile(r"(\d+)(?::(\w*))")
+vehicle_re = re.compile(r"(\d+)(?::(\w*))?")
 def create(args):
     match = vehicle_re.match(args.vehicle)
     if match is None:
         raise VehicleIdentifyerParseError(args.vehicle)
     else:
         cab, vehicle_id = match.groups()
+        if vehicle_id is None:
+            vehicle_id = ""
 
     db.create_roster_entry(args.nickname,
                            cab,
