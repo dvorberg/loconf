@@ -104,7 +104,11 @@ class PostgresConnection(DatabaseConnection):
 
         with self.cursor() as cc:
             cc.execute(command, parameters)
-            return cc.fetchone()
+            ret = cc.fetchone()
+            if ret is not None and len(ret) == 1:
+                return ret[0]
+            else:
+                return ret
 
     def commit(self):
         self.ds.commit()
