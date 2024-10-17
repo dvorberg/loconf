@@ -24,6 +24,8 @@ name 26 noise_filter
 name 28 railcom_configuration
 name 29 nmra_configuration
 
+name 47 buffer_time # In seconds.
+
 # CV 49 mXion Konfiguration
 # 2 ->   4 SUSI on/off
 # 3 ->   8 Märklin Train Bus on/off
