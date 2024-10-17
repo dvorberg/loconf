@@ -14,7 +14,8 @@ from ..utils import ( VehicleIdentifyer, print_vehicle_table,
                       verify_vehicle, CabAddressMismatch, )
 from ..language import parse_file as parse_loconf_file
 from ..station import StationException
-from ..database.controllers import store_cvs, get_all_cvs, query_vehicles
+from ..database.controllers import (store_cvs, get_all_cvs,
+                                    query_vehicles, update_vehicle)
 from ..model import Vehicle
 from . import common_args
 
@@ -145,7 +146,7 @@ def writecab(args):
     if args.new < 1:
         raise ValueError("Decoder (“cab”) addresses must be > 1.")
 
-    if args.old >= 1:
+    if not args.dont_check:
         found_cab = config.station.readcab()
         if found_cab != args.old:
             raise CabAddressMismatch(f"Vehicle on the programming track has "
@@ -153,6 +154,16 @@ def writecab(args):
                                      f"required.")
 
     config.station.writecab(args.new)
+
+    if not args.dont_update:
+        result = query_vehicles(sql.where("address = %i" % args.old))
+        count = len(result)
+        if count == 1:
+            update_vehicle(result[0], {"address": args.new})
+        else:
+            print(f"Found {count} vehicles with cab address {args.old}. "
+                  f"Not changing the roster.", file=sys.stderr)
+
 
 def reset(args):
     verify_vehicle(args.vehicle)
@@ -217,6 +228,13 @@ def main():
                                help="Write the decoder (“cab”) address or the "
                                "vehicle currently on the programming track.")
     cp.set_defaults(func=writecab)
+    cp.add_argument("-U", "--dont-update", default=False, action="store_true",
+                    help="Don’t update the roster. An update will be "
+                    "attempted if there is exactly one vehicle on file "
+                    "with the old decoder (“cab”) address.")
+    cp.add_argument("-C", "--dont-check", default=False, action="store_true",
+                    help="Don't verify the existing cab address. Use and "
+                    "number as old value, it will be ignored.")
     cp.add_argument("old", type=int, help="Provide the "
                     "old decoder (“cab”) address. Use any value < 1 to "
                     "disable this safety check at you own risk.")
