@@ -21,7 +21,7 @@ nmra_configuration := [ 0, 1 ]
 # 2 ->   4 SUSI
 # 3 ->   8 Märklin Zug Bus 
 # 4 ->  16 Motorbremse 
-# 5 ->  32 Lightausgänge normale / invers
+# 5 ->  32 Lichtausgänge normale / invers
 # 6 ->  64 Normales Mapping / Schweizer-Mapping (SM)
 # 7 -> 128 Digitalrichtung beibehalten
 49 := 0
