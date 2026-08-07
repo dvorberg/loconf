@@ -100,6 +100,28 @@ class DCCEX_Station(Station):
             else:
                 comdebug(line)
 
+    def read_all_lines(self, line_timeout=None):
+        """
+        Read all lines from the serial port until a line timeout occures.
+        """
+        if line_timeout is not None:
+            old_line_timeout = self.line_timeout
+            self.line_timeout = line_timeout
+        else:
+            old_line_timeout = None
+
+        ret = []
+        while True:
+            line = self.port.readline().rstrip()
+            if line == "":
+                if old_line_timeout is not None:
+                    self.line_timeout = old_line_timeout
+                return ret
+            else:
+                comdebug(line)
+                ret.append(line)
+
+
     def readcab(self) -> int|None:
         """
         Read the cab (DCC address) of the loco currently on the
@@ -146,7 +168,7 @@ class DCCEX_Station(Station):
         return response
 
 if __name__ == "__main__":
-    import sys, argparse, time, threading, signal, re
+    import sys, argparse, time, threading, signal, re, cmd, readline
 
     from .. import config, debug, comdebug
 
@@ -182,36 +204,62 @@ if __name__ == "__main__":
         def cancel(self):
             self.user_has_canceled = True
 
-    cmd_re = re.compile(r"sleep (?P<sleep>[0-9]+|[0-9]*\.[0-9]+)")
+    class DCCExCmd(cmd.Cmd):
+        def __init__(self):
+            super().__init__()
 
-    def main():
-        parser = argparse.ArgumentParser()
-        parser.add_argument("infiles", type=argparse.FileType("r"),
-                            nargs="*")
-        args = parser.parse_args()
+            self.prompt = "=> "
 
-        config.station.line_timeout = .03
+            self.reader_thread = ReaderThread()
+            self.reader_thread.start()
 
-        reader_thread = ReaderThread()
-        reader_thread.start()
+            signal.signal(signal.SIGINT, self.on_sigint_regular)
 
-        def terminate():
+        def on_sigint_regular(self, sig, frame):
+            # When running non-interactively, Ctrl-C terminates.
+            self.terminate()
+
+        def on_sigint_interactive(self, sig, frame):
+            # At this time Ctrl-C terminates rather than resetting the
+            # current line.
+            print()
+            raise KeyboardInterrupt()
+
+        def terminate(self):
             config.station.print("<!>") # Emergency stop.
             config.station.print("<0>") # Cut power to all tracks.
 
-            reader_thread.cancel()
-            reader_thread.join()
+            self.reader_thread.cancel()
+            self.reader_thread.join()
             sys.exit(0)
 
-        def SIGINT_handler(sig, frame):
-            terminate()
-        signal.signal(signal.SIGINT, SIGINT_handler)
+        def cmdloop(self, intro=None):
+            """
+            I re-implement this to correctly support Ctrl-D and Ctrl-C.
+            """
+            signal.signal(signal.SIGINT, self.on_sigint_interactive)
 
-        # Wait for the station’s chatter before work.
-        while not config.station.ready:
-            time.sleep(.1)
+            stop = None
+            while not stop:
+                if self.cmdqueue:
+                    line = self.cmdqueue.pop(0)
+                else:
+                    try:
+                        line = input(self.prompt)
+                    except EOFError:
+                        # Ctrl-D
+                        print()
+                        self.terminate()
+                    except KeyboardInterrupt:
+                        continue
 
-        def process_line(line):
+                    line = line.rstrip("\r\n")
+
+                self.process_line(line)
+
+
+        cmd_re = re.compile(r"sleep (?P<sleep>[0-9]+|[0-9]*\.[0-9]+)")
+        def process_line(self, line):
             if line.strip() == "":
                 print()
 
@@ -222,17 +270,18 @@ if __name__ == "__main__":
                 comdebug("# " + cmt, color="blue")
 
             if line != "":
-                match = cmd_re.match(line)
+                match = self.cmd_re.match(line)
                 if match is None:
                     # A line to be sent to the command station.
                     cmd = f"<{line}>"
                     comdebug(cmd, color="black")
 
-                    last_cmd_response = reader_thread.last_cmd_response
+                    last_cmd_response = self.reader_thread.last_cmd_response
                     config.station.print(cmd)
 
                     counter = 0
-                    while last_cmd_response == reader_thread.last_cmd_response:
+                    while last_cmd_response == \
+                          self.reader_thread.last_cmd_response:
                         time.sleep(.1)
                         counter += 1
                         if counter > 20:
@@ -245,18 +294,25 @@ if __name__ == "__main__":
                         time.sleep(t)
 
 
+
+    def main():
+        parser = argparse.ArgumentParser()
+        parser.add_argument("infiles", type=argparse.FileType("r"),
+                            nargs="*")
+        args = parser.parse_args()
+
+        config.station.line_timeout = .03
+
+        cmd = DCCExCmd()
+
+        # Wait for the station’s chatter before work.
+        while not config.station.ready:
+            time.sleep(.1)
+
         for infile in args.infiles:
             for line in infile.readlines():
-                process_line(line)
+                cmd.process_line(line)
 
-        while True:
-            print("=>", end=" ")
-            try:
-                line = input()
-            except EOFError:
-                print()
-                terminate()
-
-            process_line(line)
+        cmd.cmdloop()
 
     main()

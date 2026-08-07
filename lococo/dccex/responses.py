@@ -59,7 +59,7 @@ class TrackManagement(Response):
     """
     regex = re.compile(r"<= "
                        r"(?P<trackletter>[A-H]) "
-                       r"(?P<state>PROG|MAIN|DC|DCX)"
+                       r"(?P<state>PROG|MAIN|DC|DCX|NONE)"
                        r"( (?P<cab>\d+))?")
     trackletter: str
     state: str

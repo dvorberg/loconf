@@ -55,7 +55,7 @@ def readcvs(args):
 
     cvs = sorted(list(set(ranges())))
 
-    verify_vehicle(args.Vehicle)
+    verify_vehicle(args.vehicle)
 
     to_be_stored = {}
     try:

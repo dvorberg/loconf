@@ -3,7 +3,7 @@ import sys, traceback
 from .. import config
 import argparse
 
-from loconf.utils import (VehicleIdentifyer, VehicleIdentifyerParseError,
+from lococo.utils import (VehicleIdentifyer, VehicleIdentifyerParseError,
                           UnknownVehicle, AmbiguousAddress)
 
 def add_debug(parser:argparse.ArgumentParser, debug=True, com=True, sql=True):
